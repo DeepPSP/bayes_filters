@@ -5,8 +5,6 @@ and basic functions frequently used
 
 import sys
 import numpy as np
-from numpy import dot, zeros, eye, diag
-from math import log, exp, sqrt
 from scipy import linalg
 from scipy import stats as ss
 from copy import deepcopy
@@ -127,22 +125,22 @@ class BaseKalmanFilter(object):
         self.dim_z = dim_z  # dim. of measurements
         self.dim_u = dim_u  # dim. of control input
 
-        self.x = zeros((dim_x, 1), dtype=float)  # state
-        self.P = eye(dim_x, dtype=float)  # uncertainty covariance
-        self.u = zeros((dim_u, 1), dtype=float)  # control input
+        self.x = np.zeros((dim_x, 1), dtype=float)  # state
+        self.P = np.eye(dim_x, dtype=float)  # uncertainty covariance
+        self.u = np.zeros((dim_u, 1), dtype=float)  # control input
         self.z = np.full(shape=(dim_z,1), fill_value=np.nan, dtype=float)  # measurement
 
-        self.state_transition_mat = eye(dim_x, dtype=float)  # state transition matrix
-        self.control_transition_mat = zeros((dim_x,dim_u), dtype=float)
-        self.measurement_mat = zeros((dim_z,dim_x), dtype=float)  # measurement matrix
+        self.state_transition_mat = np.eye(dim_x, dtype=float)  # state transition matrix
+        self.control_transition_mat = np.zeros((dim_x,dim_u), dtype=float)
+        self.measurement_mat = np.zeros((dim_z,dim_x), dtype=float)  # measurement matrix
 
-        self.innovation = zeros((dim_z, 1), dtype=float)  # inovation or measurement prefit residual
-        self.innovation_covar = zeros((dim_z, dim_z), dtype=float)  # innovation (or pre-fit residual) covariance
-        self.inv_innovation_covar = zeros((dim_z, dim_z), dtype=float)
-        self.kalman_gain = zeros((dim_x, dim_z), dtype=float)  # kalman gain
+        self.innovation = np.zeros((dim_z, 1), dtype=float)  # inovation or measurement prefit residual
+        self.innovation_covar = np.zeros((dim_z, dim_z), dtype=float)  # innovation (or pre-fit residual) covariance
+        self.inv_innovation_covar = np.zeros((dim_z, dim_z), dtype=float)
+        self.kalman_gain = np.zeros((dim_x, dim_z), dtype=float)  # kalman gain
 
-        self.process_noise_covar = eye(dim_x, dtype=float)  # process uncertainty
-        self.measurement_noise_covar = eye(dim_z, dtype=float)  # state uncertainty
+        self.process_noise_covar = np.eye(dim_x, dtype=float)  # process uncertainty
+        self.measurement_noise_covar = np.eye(dim_z, dtype=float)  # state uncertainty
 
         # these will always be a copy of x, state_covar after predict() is called
         # self.x_prior = self.x.copy()
@@ -158,10 +156,10 @@ class BaseKalmanFilter(object):
         
         # identity matrix. Do not alter this.
         # self._I = eye(dim_x)
-        self._identity_mat = eye(dim_x)
+        self._identity_mat = np.eye(dim_x)
 
         # Only computed only if requested via property
-        self._log_likelihood = log(sys.float_info.min)
+        self._log_likelihood = np.log(sys.float_info.min)
         self._likelihood = sys.float_info.min
         self._mahalanobis = None
 
@@ -197,7 +195,7 @@ class BaseKalmanFilter(object):
         likelihood: float
         """
         if self._likelihood is None:
-            self._likelihood = exp(self.log_likelihood)
+            self._likelihood = np.exp(self.log_likelihood)
             if self._likelihood == 0:
                 self._likelihood = sys.float_info.min
         return self._likelihood
@@ -214,7 +212,7 @@ class BaseKalmanFilter(object):
         mahalanobis: float
         """
         if self._mahalanobis is None:
-            self._mahalanobis = sqrt(float(dot(dot(self.innovation.T, self.inv_innovation_covar), self.innovation)))
+            self._mahalanobis = np.sqrt(float(np.dot(np.dot(self.innovation.T, self.inv_innovation_covar), self.innovation)))
         return self._mahalanobis
 
 
@@ -267,8 +265,8 @@ class BaseKalmanFilter(object):
             raise ValueError('please check the sizes of the input vectors and matrics')
 
         # make prediction
-        self.x_prior = dot(self.state_transition_mat,self.x) + dot(self.control_transition_mat,self.u)
-        self.P_prior = dot(self.state_transition_mat, dot(self.P, self.state_transition_mat.T)) + self.process_noise_covar
+        self.x_prior = np.dot(self.state_transition_mat,self.x) + np.dot(self.control_transition_mat,self.u)
+        self.P_prior = np.dot(self.state_transition_mat, np.dot(self.P, self.state_transition_mat.T)) + self.process_noise_covar
 
         if self.verbose >= 1:
             print("after prediction, x_prior = {0}, P_prior = {1}".format(self.x_prior, self.P_prior))
@@ -292,13 +290,13 @@ class BaseKalmanFilter(object):
             raise ValueError('please check the sizes of the input vectors and matrics')
 
         # update
-        self.innovation = self.z - dot(self.measurement_mat,self.x_prior)
-        self.innovation_covar = dot(self.measurement_mat, dot(self.P_prior,self.measurement_mat.T)) + self.measurement_noise_covar
+        self.innovation = self.z - np.dot(self.measurement_mat,self.x_prior)
+        self.innovation_covar = np.dot(self.measurement_mat, np.dot(self.P_prior,self.measurement_mat.T)) + self.measurement_noise_covar
         self.inv_innovation_covar = np.linalg.inv(self.innovation_covar)
-        self.kalman_gain = dot(self.P_prior, dot(self.measurement_mat.T,self.inv_innovation_covar))
-        self.x = self.x_prior + dot(self.kalman_gain,self.innovation)
+        self.kalman_gain = np.dot(self.P_prior, np.dot(self.measurement_mat.T,self.inv_innovation_covar))
+        self.x = self.x_prior + np.dot(self.kalman_gain,self.innovation)
         self.x_post = deepcopy(self.x)
-        self.P = dot(self._identity_mat-dot(self.kalman_gain,self.measurement_mat), self.P_prior)
+        self.P = np.dot(self._identity_mat - np.dot(self.kalman_gain,self.measurement_mat), self.P_prior)
         self.P_post = deepcopy(self.P)
 
         return self
@@ -425,7 +423,7 @@ def mul_pdf(mean1:Union[int,float], var1:Union[int,float], mean2:Union[int,float
     mean = (var1*mean2 + var2*mean1) / (var1 + var2)
     var = 1. / (1./var1 + 1./var2)
 
-    S = np.exp(-(mean1-mean2)*(mean1-mean2) / (2*(var1+var2))) / sqrt(2*np.pi*(var1+var2))
+    S = np.exp(-(mean1-mean2)*(mean1-mean2) / (2*(var1+var2))) / np.sqrt(2*np.pi*(var1+var2))
 
     return mean, var, S
 
@@ -535,7 +533,7 @@ def inv_diagonal(S:np.ndarray)->np.ndarray:
     """
     S = np.asarray(S)
 
-    if S.ndim != 2 or S.shape[0] != S.shape[1] or (S-diag(diag(S))!=0).any():
+    if S.ndim != 2 or S.shape[0] != S.shape[1] or (S-np.diag(np.diag(S))!=0).any():
         raise ValueError('S must be a square diagonal matrix')
 
     si = np.zeros(S.shape)

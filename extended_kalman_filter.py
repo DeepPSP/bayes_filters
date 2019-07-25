@@ -4,13 +4,14 @@
 
 import sys
 import numpy as np
-from numpy import dot, zeros, eye
-from math import log, exp, sqrt
 import scipy.linalg as linalg
 from copy import deepcopy
 from typing import Union, Optional, Any, Callable
 
 from .base import BaseKalmanFilter
+
+
+np.set_printoptions(precision=5,suppress=True)
 
 
 __all__ = [
@@ -122,8 +123,8 @@ class ExtendedKalmanFilter(BaseKalmanFilter):
         super().initialize(
             init_x=init_x,
             init_P=init_P,
-            state_transition_mat=eye(self.dim_x, dtype=float),
-            measurement_mat=zeros((self.dim_z,self.dim_x), dtype=float),
+            state_transition_mat=np.eye(self.dim_x, dtype=float),
+            measurement_mat=np.zeros((self.dim_z,self.dim_x), dtype=float),
             process_noise_covar=process_noise_covar,
             measurement_noise_covar=measurement_noise_covar,
             init_u=init_u,
@@ -176,11 +177,13 @@ class ExtendedKalmanFilter(BaseKalmanFilter):
         _state_transition_mat = self.jac_state(self.x, self.u, self.state_params)
         # if self.jac_state_control_input is not None:
         #     _control_transition_mat = self.jac_state_control_input(self.x, self.u, self.state_params)
-        self.P_prior = dot(_state_transition_mat, dot(self.P, _state_transition_mat.T)) + self.process_noise_covar
+        self.P_prior = np.dot(_state_transition_mat, np.dot(self.P, _state_transition_mat.T)) + self.process_noise_covar
 
         if self.verbose >= 1:
-            print('before the prediction step, x = {0}, P = {1}'.format(self.x, self.P))
-            print('after the prediction step, x_prior = {0}, P_prior = {1}'.format(self.x_prior, self.P_prior))
+            print('***** before the prediction step,')
+            print('x = {0},\n P = {1}'.format(self.x, self.P))
+            print('***** after the prediction step,')
+            print('x_prior = {0},\n P_prior = {1}'.format(self.x_prior, self.P_prior))
 
         return self
 
@@ -213,16 +216,17 @@ class ExtendedKalmanFilter(BaseKalmanFilter):
         # update
         self.innovation = self.z - self.measurement_func(self.x_prior, self.measurement_params)
         _measurement_mat = self.jac_measurement(self.x_prior, self.measurement_params)
-        self.innovation_covar = dot(_measurement_mat, dot(self.P_prior, _measurement_mat.T)) + self.measurement_noise_covar
+        self.innovation_covar = np.dot(_measurement_mat, np.dot(self.P_prior, _measurement_mat.T)) + self.measurement_noise_covar
         self.inv_innovation_covar = np.linalg.inv(self.innovation_covar)
-        self.kalman_gain = dot(self.P_prior, dot(_measurement_mat.T, self.inv_innovation_covar))
-        self.x = self.x_prior + dot(self.kalman_gain, self.innovation)
+        self.kalman_gain = np.dot(self.P_prior, np.dot(_measurement_mat.T, self.inv_innovation_covar))
+        self.x = self.x_prior + np.dot(self.kalman_gain, self.innovation)
         self.x_post = deepcopy(self.x)
-        self.P = dot(self._identity_mat-dot(self.kalman_gain,_measurement_mat), self.P_prior)
+        self.P = np.dot(self._identity_mat-np.dot(self.kalman_gain,_measurement_mat), self.P_prior)
         self.P_post = deepcopy(self.P)
 
         if self.verbose >= 1:
-            print('for the update step,')
+            print('***** for the update step,')
+            print('the observation z =', z)
             print('innovation =', self.innovation)
             print('innovation_covar =', self.innovation_covar)
             print('kalman_gain =', self.kalman_gain)
