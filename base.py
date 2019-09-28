@@ -10,9 +10,11 @@ from scipy import stats as ss
 from copy import deepcopy
 
 from typing import Union, Optional, Any, Callable, Tuple
+from numbers import Real
 
 
 __all__ = [
+    "ArrayLike"
     "BaseKalmanFilter",
     "runge_kutta4",
     "mul",
@@ -22,7 +24,21 @@ __all__ = [
     "NESS",
     "inv_diagonal",
     "outer_product_sum",
+    "ArrayLike",
+    "ArrayLike_Float",
+    "ArrayLike_Int",
+    "EPS",
+    "FWHH",
 ]
+
+
+ArrayLike = Union[list,tuple,np.ndarray]
+ArrayLike_Float = Union[List[float],Tuple[float],np.ndarray]
+ArrayLike_Int = Union[List[int],Tuple[int],np.ndarray]
+
+
+EPS:float = np.finfo(float).eps
+FWHH:float = 2*np.sqrt(2*np.log(2))
 
 
 class BaseKalmanFilter(object):
@@ -222,8 +238,8 @@ class BaseKalmanFilter(object):
                    measurement_mat:Union[list,tuple,np.ndarray],
                    process_noise_covar:Union[list,tuple,np.ndarray],
                    measurement_noise_covar:Union[list,tuple,np.ndarray],
-                   init_u:Union[list,tuple,np.ndarray,type(None)]=None,
-                   control_transition_mat:Union[list,tuple,np.ndarray,type(None)]=None):
+                   init_u:Optional[ArrayLike]=None,
+                   control_transition_mat:Optional[ArrayLike]=None):
         """
 
         """
@@ -245,10 +261,10 @@ class BaseKalmanFilter(object):
         return self
 
 
-    def predict(self, u:Union[list,tuple,np.ndarray,type(None)]=None,
-                state_transition_mat:Union[list,tuple,np.ndarray,type(None)]=None,
-                process_noise_covar:Union[list,tuple,np.ndarray,type(None)]=None,
-                control_transition_mat:Union[list,tuple,np.ndarray,type(None)]=None):
+    def predict(self, u:Optional[ArrayLike]=None,
+                state_transition_mat:Optional[ArrayLike]=None,
+                process_noise_covar:Optional[ArrayLike]=None,
+                control_transition_mat:Optional[ArrayLike]=None):
         """
 
         """
@@ -275,8 +291,8 @@ class BaseKalmanFilter(object):
 
 
     def update(self, z:Union[list,tuple,np.ndarray],
-               measurement_mat:Union[list,tuple,np.ndarray,type(None)]=None,
-               measurement_noise_covar:Union[list,tuple,np.ndarray,type(None)]=None):
+               measurement_mat:Optional[ArrayLike]=None,
+               measurement_noise_covar:Optional[ArrayLike]=None):
         """
 
         """
@@ -303,12 +319,12 @@ class BaseKalmanFilter(object):
 
 
     def predict_update(self, z:Union[list,tuple,np.ndarray],
-                       u:Union[list,tuple,np.ndarray,type(None)]=None,
-                       state_transition_mat:Union[list,tuple,np.ndarray,type(None)]=None,
-                       measurement_mat:Union[list,tuple,np.ndarray,type(None)]=None,
-                       process_noise_covar:Union[list,tuple,np.ndarray,type(None)]=None,
-                       measurement_noise_covar:Union[list,tuple,np.ndarray,type(None)]=None,
-                       control_transition_mat:Union[list,tuple,np.ndarray,type(None)]=None):
+                       u:Optional[ArrayLike]=None,
+                       state_transition_mat:Optional[ArrayLike]=None,
+                       measurement_mat:Optional[ArrayLike]=None,
+                       process_noise_covar:Optional[ArrayLike]=None,
+                       measurement_noise_covar:Optional[ArrayLike]=None,
+                       control_transition_mat:Optional[ArrayLike]=None):
         """
 
         """
@@ -324,7 +340,7 @@ class BaseKalmanFilter(object):
         )
 
 
-def runge_kutta4(y:Union[int,float], x:Union[int,float], dx:Union[int,float], f:Callable[[Union[int,float],Union[int,float]],Union[int,float]]):
+def runge_kutta4(y:Real, x:Real, dx:Real, f:Callable[[Real,Real],Real]):
     """computes 4th order Runge-Kutta for dy/dx.
     Parameters
     ----------
@@ -346,7 +362,7 @@ def runge_kutta4(y:Union[int,float], x:Union[int,float], dx:Union[int,float], f:
     return y + (k1 + 2*k2 + 2*k3 + k4) / 6.
 
 
-def mul(mean1:Union[int,float], var1:Union[int,float], mean2:Union[int,float], var2:Union[int,float]) -> Tuple[Union[int,float]]:
+def mul(mean1:Real, var1:Real, mean2:Real, var2:Real) -> Tuple[Real]:
     """
     Multiply Gaussian (mean1, var1) with (mean2, var2) and return the
     results as a tuple (mean, var).
@@ -385,7 +401,7 @@ def mul(mean1:Union[int,float], var1:Union[int,float], mean2:Union[int,float], v
     return (mean, var)
 
 
-def mul_pdf(mean1:Union[int,float], var1:Union[int,float], mean2:Union[int,float], var2:Union[int,float]) -> Tuple[Union[int,float]]:
+def mul_pdf(mean1:Real, var1:Real, mean2:Real, var2:Real) -> Tuple[Real]:
     """
     Multiply Gaussian (mean1, var1) with (mean2, var2) and return the
     results as a tuple (mean, var, scale_factor).
@@ -428,7 +444,7 @@ def mul_pdf(mean1:Union[int,float], var1:Union[int,float], mean2:Union[int,float
     return mean, var, S
 
 
-def add(mean1:Union[int,float], var1:Union[int,float], mean2:Union[int,float], var2:Union[int,float]) -> Tuple[Union[int,float]]:
+def add(mean1:Real, var1:Real, mean2:Real, var2:Real) -> Tuple[Real]:
     """
     Add the Gaussians (mean1, var1) with (mean2, var2) and return the
     results as a tuple (mean,var).

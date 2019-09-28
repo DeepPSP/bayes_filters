@@ -7,8 +7,9 @@ import numpy as np
 import scipy.linalg as linalg
 from copy import deepcopy
 from typing import Union, Optional, Any, Callable
+from numbers import Real
 
-from .base import BaseKalmanFilter
+from .base import BaseKalmanFilter, ArrayLike
 
 
 np.set_printoptions(precision=5,suppress=True)
@@ -103,20 +104,20 @@ class ExtendedKalmanFilter(BaseKalmanFilter):
         self.measurement_params = None
 
 
-    def initialize(self, init_x:Union[list,tuple,np.ndarray],
-                   init_P:Union[list,tuple,np.ndarray],
+    def initialize(self, init_x:ArrayLike,
+                   init_P:ArrayLike,
                    state_transition_func:Callable[[np.ndarray,np.ndarray,dict],np.ndarray],
                    measurement_func:Callable[[np.ndarray,dict],np.ndarray],
                    jac_state:Callable[[np.ndarray,np.ndarray,dict],np.ndarray],
                    jac_measurement:Callable[[np.ndarray,dict],np.ndarray],
                    state_params:dict,
                    measurement_params:dict,
-                   process_noise_covar:Union[list,tuple,np.ndarray],
-                   measurement_noise_covar:Union[list,tuple,np.ndarray],
+                   process_noise_covar:ArrayLike,
+                   measurement_noise_covar:ArrayLike,
                    jac_state_control_input:Optional[Callable[[np.ndarray,np.ndarray,dict],np.ndarray]]=None,
                    jac_state_noise:Optional[Callable[[np.ndarray,np.ndarray,dict],np.ndarray]]=None,
                    jac_measurement_noise:Optional[Callable[[np.ndarray,dict],np.ndarray]]=None,
-                   init_u:Union[list,tuple,np.ndarray,type(None)]=None):
+                   init_u:Optional[ArrayLike]=None):
         """
 
         """
@@ -143,13 +144,13 @@ class ExtendedKalmanFilter(BaseKalmanFilter):
         return self
 
 
-    def predict(self, u:Union[list,tuple,np.ndarray,type(None)]=None,
+    def predict(self, u:Optional[ArrayLike]=None,
                 state_transition_func:Optional[Callable[[np.ndarray,np.ndarray,dict],np.ndarray]]=None,
                 jac_state:Optional[Callable[[np.ndarray,np.ndarray,dict],np.ndarray]]=None,
                 jac_state_control_input:Optional[Callable[[np.ndarray,np.ndarray,dict],np.ndarray]]=None,
                 jac_state_noise:Optional[Callable[[np.ndarray,np.ndarray,dict],np.ndarray]]=None,
                 state_params:Optional[dict]=None,
-                process_noise_covar:Union[list,tuple,np.ndarray,type(None)]=None):
+                process_noise_covar:Optional[ArrayLike]=None):
         """
 
         """
@@ -188,12 +189,12 @@ class ExtendedKalmanFilter(BaseKalmanFilter):
         return self
 
 
-    def update(self, z:Union[list,tuple,np.ndarray],
+    def update(self, z:ArrayLike,
                measurement_func:Optional[Callable[[np.ndarray,dict],np.ndarray]]=None,
                jac_measurement:Optional[Callable[[np.ndarray,dict],np.ndarray]]=None,
                jac_measurement_noise:Optional[Callable[[np.ndarray,dict],np.ndarray]]=None,
                measurement_params:Optional[dict]=None,
-               measurement_noise_covar:Union[list,tuple,np.ndarray,type(None)]=None):
+               measurement_noise_covar:Optional[ArrayLike]=None):
         """
 
         """
@@ -236,8 +237,8 @@ class ExtendedKalmanFilter(BaseKalmanFilter):
         return self
 
 
-    def predict_update(self, z:Union[list,tuple,np.ndarray],
-                       u:Union[list,tuple,np.ndarray,type(None)]=None,
+    def predict_update(self, z:ArrayLike,
+                       u:Optional[ArrayLike]=None,
                        state_transition_func:Optional[Callable[[np.ndarray,np.ndarray,dict],np.ndarray]]=None,
                        measurement_func:Optional[Callable[[np.ndarray,dict],np.ndarray]]=None,
                        jac_state:Optional[Callable[[np.ndarray,np.ndarray,dict],np.ndarray]]=None,
@@ -247,8 +248,8 @@ class ExtendedKalmanFilter(BaseKalmanFilter):
                        jac_measurement_noise:Optional[Callable[[np.ndarray,dict],np.ndarray]]=None,
                        state_params:Optional[dict]=None,
                        measurement_params:Optional[dict]=None,
-                       process_noise_covar:Union[list,tuple,np.ndarray,type(None)]=None,
-                       measurement_noise_covar:Union[list,tuple,np.ndarray,type(None)]=None):
+                       process_noise_covar:Optional[ArrayLike]=None,
+                       measurement_noise_covar:Optional[ArrayLike]=None):
         """
         Performs the predict/update innovation of the extended Kalman filter.
         
