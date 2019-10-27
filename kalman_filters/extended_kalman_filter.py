@@ -1,5 +1,8 @@
 """
+Module: kalman_filters
+File: extended_kalman_filter.py
 
+Remarks:
 """
 
 import sys
@@ -16,7 +19,7 @@ np.set_printoptions(precision=5,suppress=True)
 
 
 __all__ = [
-    "ExtendedKalmanFilter"
+    "ExtendedKalmanFilter",
 ]
 
 

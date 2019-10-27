@@ -1,6 +1,9 @@
 """
-Base kalman filter,
-and basic functions frequently used
+Module: kalman_filters
+File: base.py
+
+Remarks:
+Base kalman filter, and basic functions frequently used
 """
 
 import sys
@@ -9,7 +12,7 @@ from scipy import linalg
 from scipy import stats as ss
 from copy import deepcopy
 
-from typing import Union, Optional, Any, Callable, Tuple
+from typing import Union, Optional, Any, Callable, Tuple, List
 from numbers import Real
 
 
@@ -24,21 +27,13 @@ __all__ = [
     "NESS",
     "inv_diagonal",
     "outer_product_sum",
-    "ArrayLike",
-    "ArrayLike_Float",
-    "ArrayLike_Int",
     "EPS",
     "FWHH",
 ]
 
 
-ArrayLike = Union[list,tuple,np.ndarray]
-ArrayLike_Float = Union[List[float],Tuple[float],np.ndarray]
-ArrayLike_Int = Union[List[int],Tuple[int],np.ndarray]
-
-
-EPS:float = np.finfo(float).eps
-FWHH:float = 2*np.sqrt(2*np.log(2))
+EPS = np.finfo(float).eps
+FWHH = 2*np.sqrt(2*np.log(2))
 
 
 class BaseKalmanFilter(object):
