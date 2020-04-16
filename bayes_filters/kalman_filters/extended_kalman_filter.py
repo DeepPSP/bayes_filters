@@ -206,7 +206,7 @@ class ExtendedKalmanFilter(BaseKalmanFilter):
             if measurement_noise_covar is not None:
                 self.measurement_noise_covar = np.array(measurement_noise_covar, dtype=float).reshape((self.dim_z,self.dim_z))
         except:
-            raise ValueError('please check the sizes of the input vectors and matrics')
+            raise ValueError('please check the sizes of the input vectors and matrices')
         
         if measurement_func is not None:
             self.measurement_func = measurement_func
