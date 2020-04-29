@@ -97,18 +97,26 @@ class ExtendedKalmanSmoother(ExtendedKalmanFilter):
 
 
     def initialize(self, init_x, init_P, state_transition_mat, measurement_mat, process_noise_covar, measurement_noise_covar, init_u=None, control_transition_mat=None):
+        """
+        """
         return super().initialize(init_x, init_P, state_transition_mat, measurement_mat, process_noise_covar, measurement_noise_covar, init_u=init_u, control_transition_mat=control_transition_mat)
 
 
     def predict(self, u=None, state_transition_mat=None, process_noise_covar=None, control_transition_mat=None):
+        """
+        """
         return super().predict(u=u, state_transition_mat=state_transition_mat, process_noise_covar=process_noise_covar, control_transition_mat=control_transition_mat)
 
 
     def update(self, z, measurement_mat=None, measurement_noise_covar=None):
+        """
+        """
         return super().update(z, measurement_mat=measurement_mat, measurement_noise_covar=measurement_noise_covar)
 
 
     def predict_update(self, z, u=None, state_transition_mat=None, measurement_mat=None, process_noise_covar=None, measurement_noise_covar=None, control_transition_mat=None):
+        """
+        """
         return super().predict_update(z, u=u, state_transition_mat=state_transition_mat, measurement_mat=measurement_mat, process_noise_covar=process_noise_covar, measurement_noise_covar=measurement_noise_covar, control_transition_mat=control_transition_mat)
 
 

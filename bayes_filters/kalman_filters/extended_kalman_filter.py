@@ -121,8 +121,24 @@ class ExtendedKalmanFilter(BaseKalmanFilter):
                    jac_state_noise:Optional[Callable[[np.ndarray,np.ndarray,dict],np.ndarray]]=None,
                    jac_measurement_noise:Optional[Callable[[np.ndarray,dict],np.ndarray]]=None,
                    init_u:Optional[ArrayLike]=None):
-        """
+        """ initialize the whole system
 
+        Paramters:
+        ----------
+        init_x: array_like,
+        init_P: array_like,
+        state_transition_func: callable,
+        measurement_func: callable
+        jac_state: callable,
+        jac_measurement: callable,
+        state_params: dict,
+        measurement_params: dict,
+        process_noise_covar: array_like,
+        measurement_noise_covar: array_like,
+        jac_state_control_input: callable, optional,
+        jac_state_noise: callable, optional,
+        jac_measurement_noise: callable, optional,
+        init_u: array_like, optional,
         """
         super().initialize(
             init_x=init_x,
@@ -154,8 +170,17 @@ class ExtendedKalmanFilter(BaseKalmanFilter):
                 jac_state_noise:Optional[Callable[[np.ndarray,np.ndarray,dict],np.ndarray]]=None,
                 state_params:Optional[dict]=None,
                 process_noise_covar:Optional[ArrayLike]=None):
-        """
+        """ make prediction
 
+        Paramters:
+        ----------
+        u: array_like, optional,
+        state_transition_func: callable, optional,
+        jac_state: callable, optional,
+        jac_state_control_input: callable, optional,
+        jac_state_noise: callable, optional,
+        state_params: dict, optional,
+        process_noise_covar: array_like, optional,
         """
         try:
             if u is not None:
@@ -198,8 +223,15 @@ class ExtendedKalmanFilter(BaseKalmanFilter):
                jac_measurement_noise:Optional[Callable[[np.ndarray,dict],np.ndarray]]=None,
                measurement_params:Optional[dict]=None,
                measurement_noise_covar:Optional[ArrayLike]=None):
-        """
+        """ update the whole system
 
+        Paramters:
+        ----------
+        measurement_func: callable, optional,
+        jac_measurement: callable, optional,
+        jac_measurement_noise: callable, optional,
+        measurement_params: dict, optional,
+        measurement_noise_covar: array_like, optional,
         """
         try:
             self.z = np.array(z, dtype=float).reshape((self.dim_z,1))
@@ -258,7 +290,7 @@ class ExtendedKalmanFilter(BaseKalmanFilter):
         
         Parameters:
         -----------
-
+        ref. self.predict and self.update
         """
         return self.predict(
             u=u,
